@@ -24,7 +24,7 @@ return {
     --  - va)  - [V]isually select [A]round [)]paren
     --  - yinq - [Y]ank [I]nside [N]ext [']quote
     --  - ci'  - [C]hange [I]nside [']quote
-    require('mini.ai').setup { n_lines = 500 }
+    require('mini.ai').setup({ n_lines = 500 })
 
     -- Add/delete/replace surroundings (brackets, quotes, etc.)
     --
@@ -92,13 +92,15 @@ return {
 	miniclue.gen_clues.z(),
       },
     })
-    require('mini.completion').setup()
     local gen_loader = require('mini.snippets').gen_loader
     require('mini.snippets').setup({
       snippets = {
 	gen_loader.from_lang(),
       }
     })
+    require('mini.completion').setup()
+    require('mini.files').setup()
+    require('mini.bufremove').setup()
   end,
 }
 

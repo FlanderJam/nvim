@@ -129,27 +129,26 @@ return { -- LSP Configuration & Plugins
     local nvim_lsp = require 'lspconfig'
     local servers = {
       -- clangd = {},
-      -- gopls = {},
-      -- html = {},
-      -- cssls = {},
+      gopls = {},
+      html = {},
+      cssls = {},
+      -- cssmodules_ls = {}, -- used for css modules (imported css in js)
       -- pyright = {},
-      -- rust_analyzer = {},
-	--      ts_ls = {
-	-- on_attach = on_attach,
-	-- root_dir = nvim_lsp.util.root_pattern 'package.json',
-	-- single_file_support = false,
-	--      },
-      --
-      --
-      -- emmet_language_server = {},
+      rust_analyzer = {},
+      ts_ls = {
+	on_attach = on_attach,
+	root_dir = nvim_lsp.util.root_pattern 'package.json',
+	single_file_support = false,
+      },
+      emmet_language_server = {},
       denols = {
 	on_attach = on_attach,
 	root_dir = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc'),
       },
 
       lua_ls = {},
-      -- svelte = {},
-      -- tailwindcss = {},
+      svelte = {},
+      tailwindcss = {},
     }
 
 
