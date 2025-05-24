@@ -1,10 +1,10 @@
 return { -- LSP Configuration & Plugins
-  'neovim/nvim-lspconfig',
+  'mason-org/mason-lspconfig.nvim',
+  opts = {},
+
   dependencies = {
-    -- Automatically install LSPs and related tools to stdpath for neovim
-    'williamboman/mason.nvim',
-    'williamboman/mason-lspconfig.nvim',
-    'WhoIsSethDaniel/mason-tool-installer.nvim',
+    {'mason-org/mason.nvim', opts = {} },
+    'neovim/nvim-lspconfig',
   },
   config = function()
     -- Brief Aside: **What is LSP?**
@@ -132,24 +132,66 @@ return { -- LSP Configuration & Plugins
       gopls = {},
       html = {},
       cssls = {},
-      -- cssmodules_ls = {}, -- used for css modules (imported css in js)
       -- pyright = {},
       rust_analyzer = {},
       ts_ls = {
-	on_attach = on_attach,
-	root_dir = nvim_lsp.util.root_pattern 'package.json',
+	root_dir = function(bufnr, on_dir)
+	  local match = nvim_lsp.util.root_pattern('package.json')(bufnr)
+	  local deno_match = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc', 'deno.lock')(bufnr)
+	  if match ~= nil and deno_match == nil then
+	    on_dir(match)
+	  end
+	end,
 	single_file_support = false,
+	settings = {},
       },
       emmet_language_server = {},
       denols = {
-	on_attach = on_attach,
-	root_dir = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc'),
+	root_dir = function(bufnr, on_dir)
+	  local match = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc', 'deno.lock')(bufnr)
+	  if match ~= nil then
+	    on_dir(match)
+	  end
+	end,
+	settings = {},
       },
 
       lua_ls = {},
       svelte = {},
       tailwindcss = {},
+
+      zls = {
+	-- Server-specific settings. See `:help lspconfig-setup`
+
+	-- omit the following line if `zls` is in your PATH
+	cmd = { '/opt/zig/zls/zls' },
+	-- There are two ways to set config options:
+	--   - edit your `zls.json` that applies to any editor that uses ZLS
+	--   - set in-editor config options with the `settings` field below.
+	--
+	-- Further information on how to configure ZLS:
+	-- https://zigtools.org/zls/configure/
+	settings = {
+	  zls = {
+	    -- Whether to enable build-on-save diagnostics
+	    --
+	    -- Further information about build-on save:
+	    -- https://zigtools.org/zls/guides/build-on-save/
+	    -- enable_build_on_save = true,
+
+	    -- Neovim already provides basic syntax highlighting
+	    semantic_tokens = "partial",
+
+	    -- omit the following line if `zig` is in your PATH
+	    -- zig_exe_path = '/path/to/zig_executable'
+	  }
+	}
+      },
     }
+
+    for key, value in pairs(servers) do
+      vim.lsp.config(key, value)
+    end
 
 
       require('lspconfig').nushell.setup({
@@ -174,21 +216,20 @@ return { -- LSP Configuration & Plugins
     vim.list_extend(ensure_installed, {
       'stylua', -- Used to format lua code
     })
-    require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
     require('mason-lspconfig').setup {
-      ensure_installed = {},
-      automatic_installation = false,
-      handlers = {
-	function(server_name)
-	  local server = servers[server_name] or {}
-	  -- This handles overriding only values explicitly passed
-	  -- by the server configuration above. Useful when disabling
-	  -- certain features of an LSP (for example, turning off formatting for tsserver)
-	  server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-	  require('lspconfig')[server_name].setup(server)
-	end,
-      },
+      ensure_installed = ensure_installed,
+      automatic_enable = true,
+	--      handlers = {
+	-- function(server_name)
+	--   local server = servers[server_name] or {}
+	--   -- This handles overriding only values explicitly passed
+	--   -- by the server configuration above. Useful when disabling
+	--   -- certain features of an LSP (for example, turning off formatting for tsserver)
+	--   server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+	--   require('lspconfig')[server_name].setup(server)
+	-- end,
+	--      },
     }
   end,
 }

@@ -83,3 +83,35 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+
+-- ZIG stuff, probably move this...
+-- Formatting with ZLS matches `zig fmt`.
+-- The Zig FAQ answers some questions about `zig fmt`:
+-- https://github.com/ziglang/zig/wiki/FAQ
+vim.api.nvim_create_autocmd('BufWritePre',{
+  pattern = {"*.zig", "*.zon"},
+  callback = function(ev)
+    vim.lsp.buf.format()
+  end
+})
+
+vim.api.nvim_create_autocmd('BufWritePre',{
+  pattern = {"*.zig", "*.zon"},
+  callback = function(ev)
+    vim.lsp.buf.code_action({
+      context = { only = { "source.fixAll" } },
+      apply = true,
+    })
+  end
+})
+
+vim.api.nvim_create_autocmd('BufWritePre',{
+  pattern = {"*.zig", "*.zon"},
+  callback = function(ev)
+    vim.lsp.buf.code_action({
+      context = { only = { "source.organizeImports" } },
+      apply = true,
+    })
+  end
+})
+
