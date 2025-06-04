@@ -98,7 +98,10 @@ return {
 	gen_loader.from_lang(),
       }
     })
-    require('mini.completion').setup()
+    require('mini.completion').setup({
+      -- This adds a massive delay to autocompletion appearing. This is to rely less on the LSP and more on my brain
+      -- In order to open completions manually, just pres <C-Space>
+      delay = { completion = 100000000000, info = 100, signature = 50 },    })
     require('mini.files').setup()
     require('mini.bufremove').setup()
   end,
