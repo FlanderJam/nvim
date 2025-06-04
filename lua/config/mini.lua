@@ -21,21 +21,60 @@ local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 -- Mini Now Functions
 -------------------------------------------------------------------------------
 now(function()
+  require('mini.starter').setup({
+    header = table.concat({
+      "  ▓▓▓▓▓▓▓▓▓▓▓▓ ",
+      "  ╔╝░░░░░░░░╚╗ ",
+      " ╔╝▒▒▒▒▒▒▒▒▒▒╚╗",
+      " ║▒▒▒▒▒▒▒▒▒▒▒▒║",
+      " ║▒▒▒▒▒▒▒▒▒▒▒▒║",
+      " ║▒▒▒▒▒▒▒▒▒▒▒▒║",
+      " ║▒▒▒▒▒▒▒▒▒▒▒▒║",
+      " ║▒┌────────┐▒║",
+      " ║▒│ Jam Jar│▒║",
+      " ║▒└────────┘▒║",
+      " ║▒▒▒▒▒▒▒▒▒▒▒▒║",
+      " ╚════════════╝",
+      "",
+      "Pwd: " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":~:."),
+    }, '\n'),
+  })
+end)
+now(function()
   require('mini.notify').setup()
   vim.notify = require('mini.notify').make_notify()
 end)
 now(function() require('mini.icons').setup({style = 'glyph'}) end)
 now(function() require('mini.statusline').setup({use_icons = true}) end)
 now(function() require('mini.files').setup() end)
-now(function() require('mini.bufremove').setup() end)
 
 
 -------------------------------------------------------------------------------
 -- Mini Later Functions
 -------------------------------------------------------------------------------
 later(function() require('mini.comment').setup() end)
-
 later(function() require('mini.pick').setup() end)
+later(function() require('mini.cursorword').setup() end)
+later(function() require('mini.git').setup() end)
+later(function() require('mini.indentscope').setup() end)
+later(function() require('mini.bufremove').setup() end)
+
+-- Better Around/Inside textobjects
+--
+-- Examples:
+--  - va)  - [V]isually select [A]round [)]paren
+--  - yinq - [Y]ank [I]nside [N]ext [']quote
+--  - ci'  - [C]hange [I]nside [']quote
+later(function() require('mini.ai').setup({ n_lines = 500 }) end)
+
+-- Add/delete/replace surroundings (brackets, quotes, etc.)
+--
+-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+-- - sd'   - [S]urround [D]elete [']quotes
+-- - sr)'  - [S]urround [R]eplace [)] [']
+later(function() require('mini.surround').setup() end)
+
+
 later(function()
   require('mini.extra').setup()
   vim.keymap.set('n', '<leader>sh', MiniPick.builtin.help, { desc = '[S]earch [H]elp' })
@@ -55,22 +94,6 @@ later(function()
   vim.keymap.set('n', '<leader>sn', function() MiniPick.builtin.files({ source = { items = vim.fn.stdpath('config') } }) end, { desc = '[S]earch [/] in Open Files' })
 end)
 
--- Better Around/Inside textobjects
---
--- Examples:
---  - va)  - [V]isually select [A]round [)]paren
---  - yinq - [Y]ank [I]nside [N]ext [']quote
---  - ci'  - [C]hange [I]nside [']quote
-later(function() require('mini.ai').setup({ n_lines = 500 }) end)
-
--- Add/delete/replace surroundings (brackets, quotes, etc.)
---
--- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
--- - sd'   - [S]urround [D]elete [']quotes
--- - sr)'  - [S]urround [R]eplace [)] [']
-later(function() require('mini.surround').setup() end)
-
-later(function() require('mini.git').setup() end)
 later(function()
   require('mini.diff').setup({
   view = {
@@ -83,7 +106,6 @@ later(function()
   }
 })
 end)
-later(function() require('mini.cursorword').setup() end)
 
 
 later(function()
