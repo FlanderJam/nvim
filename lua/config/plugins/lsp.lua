@@ -126,81 +126,26 @@ return function(add)
   --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
   --  - settings (table): Override the default settings passed when initializing the server.
   --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-  local nvim_lsp = require 'lspconfig'
-  local servers = {
-    -- clangd = {},
-    gopls = {},
-    html = {},
-    cssls = {},
-    -- pyright = {},
-    rust_analyzer = {},
-    ts_ls = {
-      root_dir = function(bufnr, on_dir)
-	local match = nvim_lsp.util.root_pattern('package.json')(bufnr)
-	local deno_match = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc', 'deno.lock')(bufnr)
-	if match ~= nil and deno_match == nil then
-	  on_dir(match)
-	end
-      end,
-      single_file_support = false,
-      settings = {},
-    },
-    emmet_language_server = {},
-    denols = {
-      root_dir = function(bufnr, on_dir)
-	local match = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc', 'deno.lock')(bufnr)
-	if match ~= nil then
-	  on_dir(match)
-	end
-      end,
-      settings = {},
-    },
 
-    lua_ls = {},
-    svelte = {},
-    tailwindcss = {},
-
-    zls = {
-      -- Server-specific settings. See `:help lspconfig-setup`
-
-      -- omit the following line if `zls` is in your PATH
-      cmd = { '/opt/zig/zls/zls' },
-      -- There are two ways to set config options:
-      --   - edit your `zls.json` that applies to any editor that uses ZLS
-      --   - set in-editor config options with the `settings` field below.
-      --
-      -- Further information on how to configure ZLS:
-      -- https://zigtools.org/zls/configure/
-      settings = {
-	zls = {
-	  -- Whether to enable build-on-save diagnostics
-	  --
-	  -- Further information about build-on save:
-	  -- https://zigtools.org/zls/guides/build-on-save/
-	  -- enable_build_on_save = true,
-
-	  -- Neovim already provides basic syntax highlighting
-	  semantic_tokens = "partial",
-
-	  -- omit the following line if `zig` is in your PATH
-	  -- zig_exe_path = '/path/to/zig_executable'
-	}
-      }
-    },
+  local lspconfig = require('lspconfig')
+  -- Define a shared dependency bundle
+  --@type Deps
+  local deps = {
+    lspconfig = lspconfig,
+    capabilities = capabilities,
+    on_attach = function(client, bufnr)
+      -- your on_attach logic here
+    end,
   }
 
+  -- This gets sourced from outside of the nvim config repo.
+  -- How you source it is up to your discretion.
+  --@type ServerConfigMap
+  local servers = require('nvim-lsp').get_servers(deps)
+
   for key, value in pairs(servers) do
-    vim.lsp.config(key, value)
+    vim.lsp.config(key, value.server_config)
   end
-
-
-  require('lspconfig').nushell.setup({
-    cmd = { "nu", "--lsp" },
-    filetypes = { "nu" },
-    -- root_dir = require("lspconfig.util").find_git_ancestor,
-    single_file_support = true,
-  })
-
 
   -- Ensure the servers and tools above are installed
   --  To check the current status of installed tools and/or manually install
@@ -210,9 +155,14 @@ return function(add)
   --  You can press `g?` for help in this menu
   require('mason').setup()
 
-  -- You can add other tools here that you want Mason to install
-  -- for you, so that they are available from within Neovim.
-  local ensure_installed = vim.tbl_keys(servers or {})
+  --@type string[]
+  local ensure_installed = {}
+  for name, server_settings in pairs(servers or {}) do
+    if server_settings.meta_details.ensure_installed then
+      table.insert(ensure_installed, name)
+    end
+  end
+
   -- TODO: look at using mason tool installer or something. ensure installed only supports lsps, not all the other stuff.
   -- vim.list_extend(ensure_installed, {
   --   'stylua', -- Used to format lua code
@@ -221,15 +171,5 @@ return function(add)
   require('mason-lspconfig').setup {
     ensure_installed = ensure_installed,
     automatic_enable = true,
-    --      handlers = {
-    -- function(server_name)
-    --   local server = servers[server_name] or {}
-    --   -- This handles overriding only values explicitly passed
-    --   -- by the server configuration above. Useful when disabling
-    --   -- certain features of an LSP (for example, turning off formatting for tsserver)
-    --   server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-    --   require('lspconfig')[server_name].setup(server)
-    -- end,
-    --      },
   }
 end

@@ -1,3 +1,4 @@
+vim.opt.runtimepath:append("~/.config/nvim-lsp")
 require("custom.settings")
 require("config.mini")
 

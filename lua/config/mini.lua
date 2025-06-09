@@ -21,7 +21,8 @@ local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 -- Mini Now Functions
 -------------------------------------------------------------------------------
 now(function()
-  require('mini.starter').setup({
+  local starter = require('mini.starter')
+  starter.setup({
     header = table.concat({
       "  ▓▓▓▓▓▓▓▓▓▓▓▓ ",
       "  ╔╝░░░░░░░░╚╗ ",
@@ -38,6 +39,13 @@ now(function()
       "",
       "Pwd: " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":~:."),
     }, '\n'),
+    items = {
+      starter.sections.pick(),
+      starter.sections.recent_files(10, false),
+      starter.sections.recent_files(10, true),
+      { name = 'Update', action = ':DepsUpdate', section = 'Dependencies' },
+      starter.sections.builtin_actions(),
+    }
   })
 end)
 now(function()
