@@ -41,9 +41,10 @@ now(function()
     }, '\n'),
     items = {
       starter.sections.pick(),
-      starter.sections.recent_files(10, false),
-      starter.sections.recent_files(10, true),
+      starter.sections.recent_files(5, false),
+      starter.sections.recent_files(5, true),
       { name = 'Update', action = ':DepsUpdate', section = 'Dependencies' },
+      { name = 'Mason', action = ':Mason', section = 'Dependencies' },
       starter.sections.builtin_actions(),
     }
   })
