@@ -145,6 +145,10 @@ return function(add)
 
   for key, value in pairs(servers) do
     vim.lsp.config(key, value.server_config)
+    -- TODO: fix this. right now this is a patch fix to enable nu lsp
+    if value.meta_details.skip_mason then
+      vim.lsp.enable(key)
+    end
   end
 
   -- Ensure the servers and tools above are installed
