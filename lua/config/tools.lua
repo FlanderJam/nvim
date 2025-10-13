@@ -84,10 +84,6 @@ local T = {
       }
       return ls
     end)(),
-    ["eslint-lsp"] = {
-      meta_details = {},
-      server_config = {},
-    },
   },
 
   formatters_by_ft = {
@@ -104,6 +100,7 @@ local T = {
     markdown = { ordered_formatters = { "prettierd" }, meta_details = { mason = { ensure_installed = false } } },
     graphql = { ordered_formatters = { "prettierd" }, meta_details = { mason = { ensure_installed = false } } },
     go = { ordered_formatters = { "gofmt" }, meta_details = { mason = { ensure_installed = false } } },
+    zig = { ordered_formatters = { "zigfmt" }, meta_details = {} },
   },
 
   linters_by_ft = {
